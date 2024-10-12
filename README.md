@@ -1,3 +1,8 @@
+To run it :
+uvicorn app.main:app --reload
+
+
+
 # PythonBackend
 Backend para python:
 
