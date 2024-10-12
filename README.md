@@ -21,4 +21,10 @@ services/: Integrations with external services (e.g., Google Cloud).
 models/: Pydantic models and data schemas.
 utils/: Utility functions and helper methods.
 tests/: Test cases for your application.
-setup.sh: Script to set up the development environment.
+
+
+
+SETUP
+git pull
+activate virtual env
+pip install 
