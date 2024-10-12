@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from api.endpoints.quiz_model import QuizResponse
 from api.endpoints.quiz_service import evaluate_quiz, get_next_module
-# from api.endpoints.auth_service import get_user
+from api.endpoints.auth_service import get_user
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
