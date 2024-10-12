@@ -7,3 +7,10 @@ router = APIRouter()
 @router.get("/users")
 def read_example():
     return {"user": "peneeeee"}
+
+@router.get("/users/new")
+def new_user():
+    return {"hola": "peneeesotee"}
+
+
+
