@@ -1,3 +1,4 @@
+# api/endpoints/user_endpoint.py
 from fastapi import APIRouter, HTTPException
 from services.database import db
 
@@ -54,5 +55,4 @@ async def login(login_data: dict):
     if password != user['password']:
         raise HTTPException(status_code=400, detail="Invalid email or password")
     
-    # Return a simple success message
     return {"message": "Login successful", "user_id": user['id']}
