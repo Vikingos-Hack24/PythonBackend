@@ -4,17 +4,29 @@ uvicorn app.main:app --reload
 # Nombre del Proyecto
 FinPath
 
-## 1. Introducción
-Nuestro proyecto resuelve el problema de [descripción]. Está diseñado para [funcionalidad clave].
+Introducción
+Este proyecto consiste en una plataforma web de finanzas personales que analizar los perfiles financieros y comportamientos de los usuarios, adaptamos el contenido educativo en función de sus intereses, dudas o aclaraciones. Se personaliza el recorrido de aprendizaje y se ofrecen sugerencias de acciones, como opciones de inversión, prevención de fraudes y otros consejos útiles. Todo esto a través de una aplicación interactiva y sencilla, en la cual el usuario podra interactuar con un chat experto en las finanzas.
 
-## 2. Tecnologías Usadas
-- Python
-- React
-- TypeScript
-- Tailwind
-- FastAPI
-- Google Cloud
-- Gemini
+Objetivo
+El objetivo del proyecto es desarrollar una solución integral para la gestión financiera personal que permita a los usuarios no solo cargar y almacenar archivos financieros (como estados de cuenta o nóminas), sino también visualizar gráficos y obtener análisis predictivos sobre su situación financiera. Adicionalmente, los usuarios podrán completar cuestionarios de educación financiera que adaptarán los módulos de aprendizaje en función de su nivel de conocimiento.
+
+Alcance
+  El proyecto cubre tanto el frontend como el backend de la plataforma, y sus características incluyen:
+
+  + Registro y autenticación de usuarios con proveedores como Google, Apple o Facebook.
+  + Cuestionarios interactivos de educación financiera, que personalizan una ruta de aprendizaje según el nivel de conocimiento del usuario.
+  + Almacenamiento seguro de los datos de los usuarios mediante la integración con Google Cloud.
+  + Evaluación dinámica de progreso, que ajusta los módulos de aprendizaje en función del rendimiento en los cuestionarios.
+  + Chat con IA especializada en finanzas que proporciona respuestas personalizadas según el nivel de conocimiento del usuario y sus resultados en los cuestionarios.
+
+## 2. Lengaujes y tecnologías Usadas
+Python
+React
+TypeScript
+Tailwind
+FastAPI
+Google Cloud
+Gemini
 
 ## 3. Arquitectura del Proyecto
 ![Diagrama de la arquitectura](Diag_Arq.png)
@@ -30,7 +42,22 @@ Nuestro proyecto resuelve el problema de [descripción]. Está diseñado para [f
 - Node.js 14+
 
 ### Instrucciones de Instalación:
-1. Clonar el repositorio:
+1. Clonar el repositorio: 
+git clone https://github.com/Vikingos-Hack24/PythonBackend
+git clone https://github.com/Vikingos-Hack24/Frontend
+
+
+2. Instalar dependencias: 
+pip install -r requirements.txt 
+cd frontend
+npm install
+
+### Instrucciones para Ejecutar:
+1. Iniciar el backend: uvicorn main --reload
+
+2. Iniciar el frontend: 
+cd frontend
+npm start
 
 
 ## 5. Funcionalidades Principales
