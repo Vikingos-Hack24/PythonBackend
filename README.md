@@ -49,7 +49,8 @@ El objetivo del proyecto es desarrollar una solución integral para la gestión 
 - Gemini
 
 ## 3. Arquitectura del Proyecto
-![Diagrama de la arquitectura](Diag_Arq.png)
+![PHOTO-2024-10-13-11-08-45](https://github.com/user-attachments/assets/f2c6132c-9be0-4bf5-b063-0a1be67de06d)
+
 - Frontend: Desarrollado en React, Tailwind CSS y TypeScript.
 - Backend: API's construidas en FastAPI.
 - Base de datos: Almacenamiento en Firebase.
