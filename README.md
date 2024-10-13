@@ -1,32 +1,28 @@
-To run it :
-uvicorn app.main:app --reload
+# FinPath
 
-# Nombre del Proyecto
-FinPath
-
-Introducción
+## Introducción
 Este proyecto consiste en una plataforma web de finanzas personales que analizar los perfiles financieros y comportamientos de los usuarios, adaptamos el contenido educativo en función de sus intereses, dudas o aclaraciones. Se personaliza el recorrido de aprendizaje y se ofrecen sugerencias de acciones, como opciones de inversión, prevención de fraudes y otros consejos útiles. Todo esto a través de una aplicación interactiva y sencilla, en la cual el usuario podra interactuar con un chat experto en las finanzas.
 
-Objetivo
+## Objetivo
 El objetivo del proyecto es desarrollar una solución integral para la gestión financiera personal que permita a los usuarios no solo cargar y almacenar archivos financieros (como estados de cuenta o nóminas), sino también visualizar gráficos y obtener análisis predictivos sobre su situación financiera. Adicionalmente, los usuarios podrán completar cuestionarios de educación financiera que adaptarán los módulos de aprendizaje en función de su nivel de conocimiento.
 
-Alcance
+## Alcance
   El proyecto cubre tanto el frontend como el backend de la plataforma, y sus características incluyen:
 
-  + Registro y autenticación de usuarios con proveedores como Google, Apple o Facebook.
-  + Cuestionarios interactivos de educación financiera, que personalizan una ruta de aprendizaje según el nivel de conocimiento del usuario.
-  + Almacenamiento seguro de los datos de los usuarios mediante la integración con Google Cloud.
-  + Evaluación dinámica de progreso, que ajusta los módulos de aprendizaje en función del rendimiento en los cuestionarios.
-  + Chat con IA especializada en finanzas que proporciona respuestas personalizadas según el nivel de conocimiento del usuario y sus resultados en los cuestionarios.
+  - Registro y autenticación de usuarios con proveedores como Google, Apple o Facebook.
+  - Cuestionarios interactivos de educación financiera, que personalizan una ruta de aprendizaje según el nivel de conocimiento del usuario.
+  - Almacenamiento seguro de los datos de los usuarios mediante la integración con Google Cloud.
+  - Evaluación dinámica de progreso, que ajusta los módulos de aprendizaje en función del rendimiento en los cuestionarios.
+  - Chat con IA especializada en finanzas que proporciona respuestas personalizadas según el nivel de conocimiento del usuario y sus resultados en los cuestionarios.
 
 ## 2. Lengaujes y tecnologías Usadas
-Python
-React
-TypeScript
-Tailwind
-FastAPI
-Google Cloud
-Gemini
+- Python
+- React
+- TypeScript
+- Tailwind CSS
+- FastAPI
+- Google Cloud
+- Gemini
 
 ## 3. Arquitectura del Proyecto
 ![Diagrama de la arquitectura](Diag_Arq.png)
@@ -42,20 +38,20 @@ Gemini
 - Node.js 14+
 
 ### Instrucciones de Instalación:
-1. Clonar el repositorio: 
+#### 1. Clonar el repositorio: 
 git clone https://github.com/Vikingos-Hack24/PythonBackend
 git clone https://github.com/Vikingos-Hack24/Frontend
 
 
-2. Instalar dependencias: 
+#### 2. Instalar dependencias: 
 pip install -r requirements.txt 
 cd frontend
 npm install
 
 ### Instrucciones para Ejecutar:
-1. Iniciar el backend: uvicorn main --reload
+#### 1. Iniciar el backend: uvicorn main --reload
 
-2. Iniciar el frontend: 
+#### 2. Iniciar el frontend: 
 cd frontend
 npm start
 
@@ -88,91 +84,9 @@ asi lo desea.
 
 
 ## 10. Autores
-- Juan Pérez - Backend
-- María López - Frontend
+- Arzate Salazar Emiliano - Backend
+- Edson - Backend
+- Fede - Frontend
 
-
-
-
-# PythonBackend
-Backend para python:
-
-
-Posible stack de python y workflow
-
-FastAPI Para la generacion de las APIs>
-
-Conectando a base de datos posiblemente hosteado en GoogleCloud
-
-
-
-
-app/: Main application package.
-main.py: Entry point for the FastAPI app.
-core/: Core settings and configurations.
-config.py: Configuration variables and settings.
-api/: API routers and endpoints.
-endpoints/: Individual endpoint definitions.
-services/: Integrations with external services (e.g., Google Cloud).
-models/: Pydantic models and data schemas.
-utils/: Utility functions and helper methods.
-tests/: Test cases for your application.
-
-
-
-SETUP
-git pull
-activate virtual env
-pip install 
-
-
-# Endpoints:
-
-All will be using the endpoint /api/
-
-
-FEDERICO
-
-POST
-user/register/
-
-POST
-user/login/ --Utilizing Firebase AUTH
-
-GET
-user/{id}/path/
-
-GET
-user/{id}/{auth}/info/ -- All importan information to make sure to build unique dashboard for person. {{DISCUSSION NEEDED}}
-
-
-Edson
-
-POST
-user/{id}/createPath ->> Path
-information : 'String... All of the things that were mentioned in the initial survey to make sure its unique path'
-
-{
-[{level : numberOfLevel, moduleName : "nameOfModule", moduleInfo:".... Info info about module", next: [NextModules, can be one or two at maximum like a binary tree]}...
-Maximum of 7 modules
-]
-}
-
-Emi
-
-POST
-user/{id}/{moduleName}/createSurvey
-GET
-user/{id}/{moduleName}/getSurvey
-
-
-Baca
-
-POST 
-user/{id}/finPal ---- Info retrieved in the POST, answers to that specific question. (Baca sabra que mas se necesita)
-
-
-
-
-
-
+To run it :
+uvicorn app.main:app --reload
