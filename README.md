@@ -78,12 +78,10 @@ npm start
 - `GET /reportes`: Devuelve los gráficos financieros del usuario.
 
 ## 7. Base de Datos
-[Descripción del esquema de la base de datos]
+la base de datos es NOSQL por lo tanto se genera de manera automatica como va avanzando todo lo necesario, entonces es una base no relacional que contiene usuarios y cada coleccion es una representacion de cada informacion de los usuarios
 
-## 8. Interfaz de Usuario
-[Incluye capturas de pantalla o descripciones]
 
-## 9. Próximos Pasos
+## 8. Próximos Pasos
 - Poder linkear el login a usuarios de Banorte.
 - Si es usuario actual de Banorte, lo direccionara para poder gestionar sus finanzas, chequear graficos de historial financiero y ver las recomendaciones para poder invertir.
 - Implementar medidas de seguridad en login o registro.
