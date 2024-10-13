@@ -13,4 +13,3 @@ def new_user():
     return {"hola": "peneeesotee"}
 
 
-
