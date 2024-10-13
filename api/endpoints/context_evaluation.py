@@ -119,7 +119,7 @@ async def evaluate_context(request: ContextEvaluationRequest):
     try:
         # Generate content using the GenerativeModel
         logger.debug("Sending prediction request to GenerativeModel")
-        model_response = model.generate(prompt=prompt)
+        model_response = model.generate_content(prompt)
         logger.debug("Prediction received from GenerativeModel")
         
         # Log the entire response object for inspection
