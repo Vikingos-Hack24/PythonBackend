@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 user_progreso = {
     "user1@example.com": {"current_module": 1, "completed_modules": []}
 }
