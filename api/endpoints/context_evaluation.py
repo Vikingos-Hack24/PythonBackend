@@ -1,24 +1,23 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel, validator
 from typing import List
-from firebase_admin import firestore
+from firebase_admin import firestore  # Assuming you're using firebase-admin
 import vertexai
 from vertexai.generative_models import GenerativeModel
 import json
 import re
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Initialize Firestore
+db = firestore.client()
+
+# Set logging to DEBUG for detailed logs (change to INFO in production)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# Initialize Firestore (ensure Firebase Admin SDK is initialized elsewhere in your application)
-db = firestore.client()
-
-# Initialize Vertex AI
-vertexai.init(location='us-central1')  # Replace with your project ID and region
+vertexai.init(location='us-central1')  
 
 class ContextEvaluationRequest(BaseModel):
     email: str
@@ -26,6 +25,7 @@ class ContextEvaluationRequest(BaseModel):
 
     @validator('email')
     def validate_email(cls, v):
+        v = v.strip().lower()  # Trim and convert to lowercase
         email_regex = re.compile(
             r"(^[\w\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
         )
@@ -44,18 +44,6 @@ class ContextEvaluationResponse(BaseModel):
     path: List[Module]
 
 def extract_json_from_markdown(text: str) -> str:
-    """
-    Extracts JSON content from a markdown-formatted string.
-    
-    Args:
-        text (str): The markdown text containing the JSON within a code block.
-    
-    Returns:
-        str: The extracted JSON string.
-    
-    Raises:
-        ValueError: If no JSON content is found.
-    """
     pattern = r'```json\s*(\{.*?\})\s*```'
     match = re.search(pattern, text, re.DOTALL)
     if match:
@@ -65,42 +53,51 @@ def extract_json_from_markdown(text: str) -> str:
 
 @router.post("/evaluate-context/", response_model=ContextEvaluationResponse)
 async def evaluate_context(request: ContextEvaluationRequest):
+    logger.debug(f"Received request: {request.json()}")
+
     users_ref = db.collection('users')
     
-    # Query Firestore for the user
     try:
-        query = users_ref.where('email', '==', request.email).get()
-        logger.info(f"Firestore query successful for email: {request.email}")
+        # Perform a query where 'email' field equals the requested email
+        query = users_ref.where('email', '==', request.email).stream()
+        results = list(query)
+        logger.debug(f"Firestore query executed for email: {request.email}, found {len(results)} result(s)")
     except Exception as e:
         logger.error(f"Error al consultar Firestore: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error al consultar Firestore: {str(e)}")
 
-    if not query:
+    if len(results) == 0:
         logger.warning(f"Usuario no encontrado: {request.email}")
+        # For debugging: List all existing emails
+        try:
+            all_users = users_ref.stream()
+            all_emails = [user.to_dict().get('email') for user in all_users if 'email' in user.to_dict()]
+            logger.debug(f"Existing emails in Firestore: {all_emails}")
+        except Exception as e:
+            logger.error(f"Error al listar usuarios en Firestore: {e}", exc_info=True)
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    if len(query) > 1:
+    if len(results) > 1:
         logger.warning(f"Multiple users found with email: {request.email}")
         raise HTTPException(status_code=400, detail="Múltiples usuarios encontrados con el mismo correo electrónico")
 
-    user_doc = query[0]
+    user_doc = results[0]
     user_id = user_doc.id
-    logger.info(f"Usuario encontrado: {user_id}")
+    logger.debug(f"Usuario encontrado: {user_id}")
 
-    # Define the AI model
     try:
-        model = GenerativeModel("gemini-pro")  # Replace with your model name
-        logger.info("GenerativeModel instantiated successfully")
+        model = GenerativeModel("gemini-1.0-pro")  # Replace with your model name
+        logger.debug("GenerativeModel instantiated successfully")
     except Exception as e:
         logger.error(f"Error al instanciar GenerativeModel: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error al instanciar GenerativeModel: {str(e)}")
 
-    # Prepare the prompt
     prompt = f"""
     {request.text}
 
     Genera un JSON con la siguiente estructura:
 
+    ```json
     {{
         "pathType": "Tipo de path",
         "path": [
@@ -113,16 +110,17 @@ async def evaluate_context(request: ContextEvaluationRequest):
             ...
         ]
     }}
-    El pathType solo puede ser uno de los cuatro valores: Seguridad financiera, resilencia financiera, control financiero, libertad financiera.
+    ```
+    El pathType solo puede ser uno de los cuatro valores: Seguridad financiera, Resilencia financiera, Control financiero, Libertad financiera.
     Todas las respuestas deben estar en español, enfocadas para una audiencia latinoamericana.
     Genera al menos 5 módulos.
     """
 
     try:
         # Generate content using the GenerativeModel
-        logger.info("Sending prediction request to GenerativeModel")
-        model_response = model.generate_content(prompt)
-        logger.info("Prediction received from GenerativeModel")
+        logger.debug("Sending prediction request to GenerativeModel")
+        model_response = model.generate(prompt=prompt)
+        logger.debug("Prediction received from GenerativeModel")
         
         # Log the entire response object for inspection
         logger.debug(f"Full GenerationResponse: {model_response}")
@@ -130,7 +128,7 @@ async def evaluate_context(request: ContextEvaluationRequest):
         # Extract the generated text using the provided method
         try:
             generated_text = model_response.candidates[0].content.parts[0].text
-            logger.info(f"Generated Text: {generated_text}")
+            logger.debug(f"Generated Text: {generated_text}")
         except (AttributeError, IndexError) as e:
             logger.error(f"Error al extraer el texto generado: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail="Error al extraer el texto generado del modelo de IA")
@@ -138,9 +136,10 @@ async def evaluate_context(request: ContextEvaluationRequest):
         # Extract JSON from the generated markdown text
         try:
             json_text = extract_json_from_markdown(generated_text)
-            logger.info(f"Extracted JSON Text: {json_text}")
+            logger.debug(f"Extracted JSON Text: {json_text}")
         except ValueError as e:
             logger.error(f"Error al extraer JSON del texto generado: {e}", exc_info=True)
+            logger.debug(f"Generated Text for JSON Extraction: {generated_text}")  # Log the text that failed extraction
             raise HTTPException(status_code=500, detail="Error al extraer JSON del texto generado por el modelo de IA")
         
     except Exception as e:
@@ -148,21 +147,19 @@ async def evaluate_context(request: ContextEvaluationRequest):
         raise HTTPException(status_code=500, detail=f"Error al generar contenido con el modelo de IA: {str(e)}")
 
     try:
-        # Parse the extracted JSON
         data = json.loads(json_text)
-        logger.info("Generated JSON parsed successfully")
+        logger.debug("Generated JSON parsed successfully")
     except json.JSONDecodeError as e:
         logger.error(f"JSON generado inválido: {e}", exc_info=True)
+        logger.debug(f"Extracted JSON Text: {json_text}")  # Log the JSON text that failed to parse
         raise HTTPException(status_code=500, detail=f"JSON generado inválido: {str(e)}")
 
-    # Validate pathType
     valid_path_types = ["Seguridad financiera", "Resilencia financiera", "Control financiero", "Libertad financiera"]
     path_type = data.get("pathType")
     if path_type not in valid_path_types:
         logger.warning(f"pathType inválido: {path_type}")
         raise HTTPException(status_code=400, detail=f"pathType inválido: '{path_type}'. Debe ser uno de {valid_path_types}")
 
-    # Validate path
     path = data.get("path")
     if not isinstance(path, list):
         logger.warning("El campo 'path' no es una lista")
@@ -171,7 +168,6 @@ async def evaluate_context(request: ContextEvaluationRequest):
         logger.warning(f"Se requieren al menos 5 módulos, pero se recibieron {len(path)}")
         raise HTTPException(status_code=400, detail="Se requieren al menos 5 módulos en 'path'")
 
-    # Validate each module's structure
     required_module_keys = {"moduleNumber", "moduleTitle", "moduleDescription", "moduleInformation"}
     for idx, module in enumerate(path, start=1):
         if not isinstance(module, dict):
@@ -185,12 +181,11 @@ async def evaluate_context(request: ContextEvaluationRequest):
                 detail=f"El módulo en la posición {idx} carece de las claves: {', '.join(missing_keys)}"
             )
 
-    # Update the user's document with the context evaluation data
     try:
         users_ref.document(user_id).update({
             'contextEvaluation': data
         })
-        logger.info(f"Evaluación de contexto actualizada para el usuario: {user_id}")
+        logger.debug(f"Evaluación de contexto actualizada para el usuario: {user_id}")
     except Exception as e:
         logger.error(f"Error al actualizar Firestore: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error al actualizar Firestore: {str(e)}")
